@@ -1,0 +1,141 @@
+# Programa: Busca Binária
+# Descrição: Percorre um vetor ordenado da memória e verifica se um valor K pertecence ao vetor em log(n).
+#		A busca binária funciona da seguinte forma: teremos dois enderecos (atualEsq, atualDir) que apontam para
+#		o começo o para o final do vetor atual. Calculamos o endereco do elemento na metade do vetor atual,
+#		verificamos se ele é o elemento que procuramos; se for, carregamos um em AC, se não for, verificamos se
+#		o valor buscado está a direita ou à esquerda do valor atual, atualizamos os endereços do vetor e repetimos
+#		até o vetor atual ter tamanho 0.
+# Variáveis de 'usuario' que devem ser setadas antes do comeco do programa:
+#	-> comeco: endereço do primeiro elemento do vetor na memoria.
+#	-> tam: número de elementos no vetor.
+#	-> tam posicoes de memória a partir de comeco: dados do vetor, note que ele deve estar ordenado.
+
+
+
+# CODIGO
+
+# Calcula o endereco do ultimo elemento do vetor.
+				load comeco
+				add tamanho
+				str fim
+
+# Inicia os indices esquerdo e direito do vetor atual.
+				load comeco
+				str atualEsq
+				load fim
+				str atualDir
+
+# Loop que faz a busca binária no vetor.
+
+# Calcula o candidato atual (valor no 'meio' do vetor).
+
+loop:			load atualDir
+				sub atualEsq
+				rsh
+				add atualEsq
+				str candidato
+
+
+				jmp verifVal				# Chama a 'funcao' verifVal, para descobrir se o candidato atual eh o que estávamos buscando.
+
+# Nesse ponto, o candidato atual nao era o que buscavamos e o valor (candidato-k) está em difCand.
+
+retLoop:		load difCand
+				jgez kAEsq					# Se candidato for maior do que k, k deve estar à esquerda de candidato.
+
+# Se candidato for menor do que k, k está à direita de candidato.
+# Verifica se candidato == atualEsq, ou seja, se já percorremos todo o vetor.
+
+kADir:			load candidato
+				sub atualEsq
+				str aux
+				load zero
+				subabs aux
+
+				jgez valorNFound			# Se já percorremos todo o vetor, não encontramos o valor k no vetor.
+
+# Atualiza atualEsq e continua a busca.
+				load candidato
+				str atualEsq
+				jmp loop
+
+# Verifica se candidato == atualDir, ou seja, se já percorremos todo o vetor.
+
+kAEsq:			load candidato
+				sub atualDir
+				str aux
+				load zero
+				subabs aux
+
+				jgez valorNFound			# Se já percorremos todo o vetor, não encontramos o valor k no vetor.
+
+# Atualiza atualEsq e continua a busca.
+				load candidato
+				str atualDir
+				jmp loop
+
+# 'Funcao' que verifica se um candidato é igual a k.
+
+verifVal:		load candidato				# Carrega o valor no endereço apontado por 'candidato'.
+				stm ldCand
+ldCand:			load candidato 				# Endereco modificado pela stm anterior, buscando o dado no endereço 'candidato'.
+
+# Compara o candidato com k.
+				sub k
+				str difCand
+				load zero
+				subabs difCand
+
+# Se a diferença for zero, encontramos k no vetor, carrega um em AC e encerra.
+				jgez valFound				# O salto será feito somente se o valor em difCand for 0.
+				jmp retLoop					# Volta para o loop que percorre o vetor
+
+
+# 'Funcao' para k pertencendo ao vetor.
+
+valFound:		load um						# Carrega um em AC indicando que o valor foi encontrado.
+				jmp encerra
+
+# 'Funcao' para k nao pertencendo ao vetor.
+
+valorNFound:	ldn um						# Carrega -um em AC indicando que o valor nao foi encontrado.
+jmp encerra
+
+
+
+# DADOS
+				.align 0x1
+fim:			.word 0x0						# Endereco do ultimo elemento do vetor.
+k:				.word 0x21					# Valor K sendo buscado no vetor.
+
+candidato:		.word 0x0						# Endereco do valor que sera comparado com o valor buscado.
+difCand:		.word 0x0						# Diferenca entre o candidato e k (candidato-k).
+atualEsq:		.word 0x0						# Endereco do indice atual esquerdo do vetor.
+atualDir:		.word 0x0						# Endereco do indice atual direito do vetor.
+
+zero:			.word 0x0 					# Constante 0.
+um:				.word 0x1 					# Constante 1.
+aux:			.word 0x0 					# Variavel auxiliar.
+
+comeco:			.word 0x100					# Endereco do primeiro elemento do vetor
+tamanho:		.word 0xc					# Numero de elementos no vetor.
+
+# Vetor ordenado
+				.org 0x100
+
+				.word 0x1
+				.word 0x3
+				.word 0x7
+				.word 0x8
+				.word 0xA
+				.word 0x14
+				.word 0X18
+				.word 0x1B
+				.word 0x1d
+				.word 0x21
+				.word 0X2f
+				.word 0x64
+
+#fim do programa
+				.org 0x400
+encerra:

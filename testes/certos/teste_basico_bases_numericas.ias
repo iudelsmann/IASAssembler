@@ -1,0 +1,38 @@
+	.oRg 0o400
+
+		.WORD 0B10000
+	
+	.org 0
+		.seT ADDR 0x100
+		
+alvo:	LDMQM M(adDR)
+		MUL m(0x101)
+		LDMQ
+		
+		LOAD M(257)
+		DIV M(ADDR)
+																																																																			
+		add M(0X101)
+#############################################		
+		AdDaBs			M(addr)
+#--------------------------------------------		
+		rsh
+		lsh
+		
+		sub M(0O400)
+		SUBABS M(addr)
+		
+		STR M(0x101)
+		LDN M(addr)
+		LDABS M(0o401)
+		
+		jgez prox
+prox:
+		stm alvo
+
+		.set aDDr 1024
+		JMP M(addr)
+		
+	.align 1
+	.org 257
+		.word 0b100000

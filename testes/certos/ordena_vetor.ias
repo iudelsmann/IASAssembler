@@ -1,0 +1,103 @@
+# Programa que ordena um vetor dado de tamanho arbitrario
+# O vetor eh ordenado em tempo quadratico
+
+.org 0x100
+
+.align 0x1
+
+var_i:		.word 0x0
+var_j:		.word 0x0
+var_swap:	.word 0x0
+
+cte_ONE:	.word 0x1
+cte_TWO:	.word 0x2
+
+.org 0x1FF
+cte_N:		.word 0xA					# Insira o tamanho do vetor aqui
+
+.org 0x200
+pointer:	.word 0x300					# Endereco inicial do vetor
+
+.org 0x300
+			.word 0x4					# Insira o vetor aqui
+			.word 0x3
+			.word 0xA
+			.word 0x5
+			.word 0x6
+			.word 0x1
+			.word 0x2
+			.word 0x9
+			.word 0x8
+			.word 0x7
+
+.org 0x000
+
+	LOAD cte_N
+	SUB  cte_TWO						# i = n-2
+	STR  var_i
+	
+	iloop:								# Inicio do loop externo
+	
+		LOAD cte_N
+		SUB  cte_TWO					# j = n-2
+		STR  var_j
+		
+			jloop:						# Inicio do loop interno
+
+				LOAD pointer			# Carregando apontador da primeira posicao
+
+				ADD  var_j
+				STM  compj				# Atualizando posicoes de v[j]
+				STM  swaplj
+				STM  swapsj
+
+				ADD  cte_ONE
+				STM  compj1				# Atualizando posicoes de v[j+1]
+				STM  swaplj1
+				STM  swapsj1
+
+			compj1:
+				LOAD M(0x001) 			# 	Carregando v[j+1]
+			compj:
+				SUB  M(0x000) 			#	Subtraindo com v[j]
+				
+				JGEZ swap_end			#	Comparando v[j+1] > v[j]
+										#	Realiza a troca se necessario
+			swaplj1:	
+				LOAD M(0x001) 			#	carregando v[j+1]
+				STR var_swap  			#	aux = v[j+1]
+			swaplj:	
+				LOAD M(0x000) 			# 	carregando v[j]
+			swapsj1:	
+				STR M(0x001)  			#	v[j+1] = v[j]
+				LOAD var_swap 			# 	carregando aux
+			swapsj:	
+				STR M(0x000)  			#	v[j] = aux
+					
+			swap_end:					#	fim da troca
+				
+				LOAD var_j	
+				SUB  cte_ONE			#	Decrementando contador
+				STR  var_j				#	do loop interno
+				JGEZ jloop	
+			
+		LOAD var_i	
+		SUB  cte_ONE					#	Decrementando contador
+		STR  var_i						#	do loop externo
+		JGEZ iloop
+	
+
+						#	Essa parte e opcional,
+	LOAD M(0x300)		#	serve para visualizar o
+	LOAD M(0x301)		#	vetor ordenado no simulador
+	LOAD M(0x302)		#	do IAS mais facilmente
+	LOAD M(0x303)
+	LOAD M(0x304)
+	LOAD M(0x305)
+	LOAD M(0x306)
+	LOAD M(0x307)
+	LOAD M(0x308)
+	LOAD M(0x309)
+
+#FINAL
+	JMP M(0x400)			# Salto para encerrar o programa

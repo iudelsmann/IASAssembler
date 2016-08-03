@@ -1,0 +1,6 @@
+.set rotulo 0x000
+
+	ADD M(0x10)
+
+rotulo:
+	JMP (x400)

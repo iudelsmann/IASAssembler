@@ -1,0 +1,12 @@
+.org 0x100
+
+.align 1
+var:		.word 0x100000000000
+
+.org 0x000
+
+	LOAD var
+	ADD M(0x000)
+	
+	JMP m(0x400)
+	

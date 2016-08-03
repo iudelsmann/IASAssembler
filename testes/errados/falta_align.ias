@@ -1,0 +1,9 @@
+loop:
+	LOAD	val1
+	SUB		val2
+	JMP		loop
+	
+val1:
+	.word	0x10
+val2:
+	.word	0x20

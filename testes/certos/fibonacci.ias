@@ -1,0 +1,78 @@
+# Programa que computa iterativamente o n-esimo numero de Fibonacci
+# A sequencia de Fibonacci e definida pela relacao de recorrencia:
+
+# Fib(0) = 0
+# Fib(1) = 1
+# Fib(n) = Fib(n-1) + Fib(n-2)
+
+# No entanto, Fib(n) e calculado de maneira iterativa no programa
+
+# n pode ser um numero negativo tambem
+# nesse caso, a relacao pode ser reescrita:
+# Fib(n-2) = Fib(n) - Fib(n-1)
+																															
+
+				
+#DADOS
+			.org 0x100
+
+			.align 0x1
+var_A:		.word 0x0					# fib(0) = 0	## (Pode-se alterar para gerar
+var_B:		.word 0x1					# fib(1) = 1	##  diferentes sequencias numericas)
+var_C:		.word 0x0
+var_itr:	.word 0x0
+
+cte_ONE:	.word 0x1
+cte_TWO:	.word 0x2
+
+			.org 0x200
+input_N:	.word 0x1E					# Coloque o n inicial aqui
+
+																																																																																																																																									  
+#SAIDA														                            					            															 	
+			.org 0x201
+output_fibN:
+
+
+#CODIGO
+			.org 0x000
+
+			LDABS input_N				# O modulo de n e carregado
+			str var_itr					# e copiado para um contador
+
+main_loop:								# Esse e o loop principal do programa
+
+			LOAD var_B
+			STR  var_C
+										# Fib(n) e calculado com o auxilio
+			LOAD var_A					#  de tres variaveis que sao usadas
+			STR  var_B					#  para guardar Fib(n-1) e Fib(n-2)
+	
+			LOAd var_A
+			aDd  var_C					# Esses valores sao somados e rearmazenados
+			sTR  var_A
+	
+			LOAD var_itr				# O contador e decrementado
+			SUB  cte_ONE
+			STR  var_itr
+	
+	
+								JGEZ     		   	main_loop
+																														   
+																														   
+			LOAD	input_N				# Essa parte do programa tem como
+			JGEZ	final				# unico proposito calcular Fib(n)
+			DIV		cte_TWO				##caso n<0
+			SUB		cte_ONE				
+			
+			JGEZ final					# Lembrando que para n<0, temos:
+			LDN var_B					#  Fib(n) =  Fib(-n), se n e impar
+			STR var_B					#  Fib(n) = -Fib(-n), se n e par
+final:
+
+			LOAD var_B					# O resultado e carregado e
+			STR  output_fibN			# armazenado em variavel de saida
+
+###############################################################################################################################################################################################################################################################################################
+			
+			JMP M(0x400)				# Salto para encerrar o programa

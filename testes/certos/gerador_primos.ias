@@ -1,0 +1,155 @@
+# Programa: Gerador de Números Primos
+# Descrição: Gera o n-ésimo número primo, começando com os primos '2' e '3' armazenados na memória.
+# 		para n <=2: simplesmente carrega o valor armazenado na memória em AC.
+#		para n > 2: carrega o maior primo calculado até então, e soma 2 a este valor até obter um novo número primo.
+#				Repete esse processo n-2 vezes. Depois carrega o ultimo primo calculado em AC.
+# Variáveis de 'usuario' que devem ser setadas antes do comeco do programa:
+#	-> n: qual número primo o usuário deseja calcular.
+
+
+
+# CODIGO
+
+			.org 0x000
+
+# O último primo "calculado" até agora é o '2' que está armazenado na posição 'primeiro'.
+			load primeiro
+			str ultimo
+
+# Verifica se n = 1.
+			sub primeiro
+			sub n
+			add um
+
+# Caso n == 1, retorna primo(1)
+			jgez resultado
+
+# Caso n>1. Avança em uma posicao o endereco do primo atual
+			load ultimo
+			add um
+			str ultimo
+
+									      
+# Verifica se n = 2.
+			sub primeiro
+			sub n
+			add um
+			jgez resultado						# Caso n == 2, retorna primo(2) 
+
+# Começa o calculo dos primos.
+
+# Carrega o endereço do ultimo primo calculado e toma o endereço do próximo a ser calculado como este endereço + 1.
+
+iniCalc:	load ultimo
+			stm lUltPrimo
+			add um
+
+# Atualiza o endereço do novo primo a ser calculado.
+			str ultimo
+
+# Proximo primo a ser calculado começa com o palpite: primo anterior + 2.
+			stm sCandPrimo
+			stm strCand
+			stm cProxPrimo
+
+lUltPrimo:	load ultimo							# Este load foi mod. pela função stm, ele carrega o dado no endereço de memória do endereço 'ultimo'.
+strCand:	str ultimo 							# Este str foi modificado pela função stm, ele armazena AC no endereço de memória escrito em 'ultimo'.
+cProxPrimo:	load ultimo 						# Também foi alterado por stm.
+			
+			add um
+			add um 								# Candidato = primo anterior + 2
+
+sCandPrimo:	str ultimo 							# Também foi alterado por stm.
+
+# Salto incondicional para a 'função' verPrimo. Esta vai dar um jump incondicional após o calculo para a instrução seguinte.
+			jmp verPrimo 						# Aqui, após a execução de 'verPrimo', AC == 1 se o candidato não for primo, AC == -1 caso seja.
+
+# O salto será feito caso não tenhamos encontrado o proximo primo ainda. O próximo candidato será o candidato anterior + 2.
+
+contCalc:	jgez cProxPrimo
+
+# Neste ponto, encontramos o proximo numero primo.
+
+# Verifica se já calculamos os N números primos.
+			load ultimo
+			sub primeiro
+			sub n
+			add um
+			jgez resultado 						# Calculamos N primos, carrega o N-ésimo em AC e encerra.
+			jmp iniCalc							# Volta para o início do loop, para calcular o próximo primo.
+
+
+# 'Função' verifica primo: Carrega o endereço do primeiro primo calculado e atualiza a 'variável' 'atual' com seu endereço.
+			verPrimo:
+			load primeiro
+			str atual
+
+# Carrega o candidato atual, o divide pelo primo atual.
+
+loopVprimo: load ultimo
+			stm laodCand
+			load atual
+			stm divCand
+
+laodCand:	load ultimo ## Alterado por stm.
+divCand:	div atual ## Alterado por stm.
+
+# Verifica se o resto da divisão foi zero.
+			str aux
+			ldn aux
+
+# O salto será feito se o resultado da divisão foi zero.
+			jgez retPos 						# Atualiza AC com um valor positivo, indicando que o candidato não era primo.
+
+# Avança o endereço do primo atual.
+			load atual
+			add um
+			str atual
+
+# Verifica se já conferimos com todos os primos menores que o candidato atual.
+			load ultimo
+			sub atual
+			sub um
+
+# O salto será feito se ainda faltarem primos para fazermos o teste.
+			jgez loopVprimo						# Volta para o começo do loop.
+
+# Nesse ponto, o numero era primo :)
+			jmp retNeg 							# Atualiza AC com um valor negativo, indicando que o candidato não era primo.
+retPos:		load um
+			jmp contCalc
+retNeg:		ldn um
+			jmp contCalc
+
+# Calcula o resultado em AC.
+
+resultado:	load ultimo
+			stm carregaRes
+
+carregaRes:	load ultimo 						# Alterado pela stm.
+
+			jmp final							# Salto incondicional para fora do mapa de memória, para encerrar o programa.
+
+
+
+# DADOS
+			.align 0x1
+
+n:			.word 0x19							# Variável N. Será calculado o N-ésimo primo.
+um:			.word 0x1 							# Constante 1.
+aux:		.word 0x0							# Variável auxiliar.
+
+ultimo:		.word 0x0							# Endereco do ultimo primo calculado, ou do atual candidato, se estivermos no meio do cálculo.
+atual:		.word 0x0							# Variável usada pelo 'verPrimo', endereço do primo atual da lista de primos conhecidos.
+
+# Números primos calculados, indo de 0x100 até 0x3ff, note que isso limita N para até 767.
+
+primeiro:	.word 0x100							# endereco do primeiro numero primo calculado.
+			.org 0x100
+
+			.word 0x2								# Primeiro número primo.
+			.word 0X3								# Segundo número primo.
+
+# Endereco do jump para encerrar o programa.
+			.org 0x400
+final:

@@ -1,0 +1,7 @@
+tag_1:	
+	ADD m(0x10)
+
+tag_1:
+	add m(0x20)
+
+jmp M(0x400)
